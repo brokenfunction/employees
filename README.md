@@ -13,3 +13,4 @@
 
 Runs the app in the development mode.<br>
 Open [http://localhost:3000/](http://localhost:3000/) to view it in the browser.
+![ScreenShot](https://raw.githubusercontent.com/Roman1488/employees/master/Screenshot_1.png)
