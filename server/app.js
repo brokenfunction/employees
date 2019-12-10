@@ -1,11 +1,19 @@
 const express = require('express');
 const logger = require('morgan');
 const cors = require('cors');
+const auth = require('http-auth');
+
+const basicAuth = auth.basic({
+    realm: "Root",
+    file: __dirname + "/data/users.htpasswd"
+});
 
 const employeesRouter = require('./routes/employees');
 const departmentRouter = require('./routes/departnemt');
 
 const app = express();
+
+app.use(auth.connect(basicAuth));
 app.use(cors());
 app.use(logger('dev'));
 app.use(express.json());
