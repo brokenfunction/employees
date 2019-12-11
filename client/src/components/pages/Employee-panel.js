@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import Axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
 import Employee from '../ui/Employee';
 import Search from '../ui/Search';
 import Pagination from '../ui/Pagination';
+import 'react-toastify/dist/ReactToastify.min.css';
 
 class EmployeePanel extends Component {
   constructor(props) {
@@ -24,13 +26,17 @@ class EmployeePanel extends Component {
     const { currentPage, limit } = this.state.pagination;
     const employees = Axios.get(`/employees/?page=${currentPage}&limit=${limit}`);
     const departments = Axios.get('/departments/');
-    Promise.all([employees, departments]).then(response => {
-      this.setState({
-        employees: response[0].data.employee,
-        pagination: response[0].data.pagination,
-        departments: response[1].data,
+    Promise.all([employees, departments])
+      .then(response => {
+        this.setState({
+          employees: response[0].data.employee,
+          pagination: response[0].data.pagination,
+          departments: response[1].data,
+        });
+      })
+      .catch(error => {
+        toast.error(error.message);
       });
-    });
   }
 
   onDelete = id => {
@@ -40,6 +46,7 @@ class EmployeePanel extends Component {
       this.setState({
         employees: employees.filter(employee => employee.id !== id),
       });
+      toast.success(response.data.message);
     });
   };
 
@@ -63,6 +70,11 @@ class EmployeePanel extends Component {
         ? [...employees]
         : [...employees.filter(emp => emp.id !== id), response.data];
       this.setState({ employees: newEmployees });
+      if (isUpdate) {
+        toast.success(`Employee ${employee.name} updated successfully`);
+      } else {
+        toast.success(`Employee ${employee.name} added successfully`);
+      }
     });
   };
 
@@ -105,45 +117,52 @@ class EmployeePanel extends Component {
   render() {
     const { employees, departments, pagination, query } = this.state;
     return (
-      <div className="section container">
-        <div className="row section-header">Employees</div>
-        <div className="row section-body employee-panel">
-          <div className="employee-panel__top-control">
-            <Search query={query} searchEmployees={this.searchEmployees} />
-            <button onClick={this.addEmptyEmployee} className="ui green circular icon button">
-              <i className="icon plus circle" />
-            </button>
+      <>
+        <ToastContainer autoClose={3000} hideProgressBar />
+        <div className="section container">
+          <div className="row section-header">Employees</div>
+          <div className="row section-body employee-panel">
+            <div className="employee-panel__top-control">
+              <Search query={query} searchEmployees={this.searchEmployees} />
+              <button
+                type="button"
+                onClick={this.addEmptyEmployee}
+                className="ui green circular icon button"
+              >
+                <i className="icon plus circle" />
+              </button>
+            </div>
+            <table className="ui selectable single line table">
+              <thead>
+                <tr>
+                  <th>Full Name</th>
+                  <th>Active</th>
+                  <th>Department</th>
+                  <th className="employee-edit-container" />
+                </tr>
+              </thead>
+              <tbody>
+                {employees.map(employee => (
+                  <Employee
+                    key={employee.id || employee.tempId}
+                    departments={departments}
+                    onDelete={this.onDelete}
+                    onSave={this.onSave}
+                    employee={employee}
+                  />
+                ))}
+              </tbody>
+            </table>
+            {pagination.totalPages && (
+              <Pagination
+                query={query}
+                getEmployeesPage={this.getEmployeesPage}
+                pagination={pagination}
+              />
+            )}
           </div>
-          <table className="ui selectable single line table">
-            <thead>
-              <tr>
-                <th>Full Name</th>
-                <th>Active</th>
-                <th>Department</th>
-                <th className="employee-edit-container" />
-              </tr>
-            </thead>
-            <tbody>
-              {employees.map(employee => (
-                <Employee
-                  key={employee.id || employee.tempId}
-                  departments={departments}
-                  onDelete={this.onDelete}
-                  onSave={this.onSave}
-                  employee={employee}
-                />
-              ))}
-            </tbody>
-          </table>
-          {pagination.totalPages && (
-            <Pagination
-              query={query}
-              getEmployeesPage={this.getEmployeesPage}
-              pagination={pagination}
-            />
-          )}
         </div>
-      </div>
+      </>
     );
   }
 }
