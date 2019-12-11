@@ -15,6 +15,8 @@ module.exports = {
                     res.status(400).json({
                         error: 'Department ID is not valid'
                     });
+                } else {
+                    res.status(500).send(error);
                 }
             });
     },
@@ -48,7 +50,7 @@ module.exports = {
                 };
                 res.status(201).send({employee: employee.rows, pagination});
             })
-            .catch(error => res.status(400).send(error))
+            .catch(error => res.status(500).send(error))
     },
     selectByID(req, res) {
         return Employee
