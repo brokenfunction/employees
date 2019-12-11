@@ -1,46 +1,39 @@
-import React, { Component } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 
-class Search extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      query: '',
-    };
-  }
+const Search = props => {
+  const { searchEmployees, query } = props;
 
-  handleChange = event => {
+  const handleChange = event => {
     const { value } = event.target;
-    const { searchEmployees } = this.props;
-
-    this.setState({ query: value });
     searchEmployees(value);
   };
 
-  render() {
-    const { query } = this.state;
-    const { searchEmployees } = this.props;
+  return (
+    <form
+      onSubmit={e => {
+        e.preventDefault();
+        searchEmployees(e.target.elements.query.value);
+      }}
+      className="ui action input"
+    >
+      <input
+        onChange={handleChange}
+        value={query}
+        type="search"
+        name="query"
+        placeholder="Search..."
+      />
+      <button type="submit" className="ui icon button">
+        <i className="search icon" />
+      </button>
+    </form>
+  );
+};
 
-    return (
-      <form
-        onSubmit={e => {
-          e.preventDefault();
-          searchEmployees(e.target.elements.query.value);
-        }}
-        className="ui action input"
-      >
-        <input
-          onChange={this.handleChange}
-          value={query}
-          type="search"
-          name="query"
-          placeholder="Search..."
-        />
-        <button type="submit" className="ui icon button">
-          <i className="search icon" />
-        </button>
-      </form>
-    );
-  }
-}
+Search.propTypes = {
+  searchEmployees: PropTypes.func.isRequired,
+  query: PropTypes.string.isRequired,
+};
 
 export default Search;

@@ -69,7 +69,11 @@ class Employee extends Component {
       );
     } else if (employee.id) {
       alterButton = (
-        <button onClick={this.onEditing} className={'ui teal basic icon button action-button'}>
+        <button
+          type="button"
+          onClick={this.onEditing}
+          className="ui teal basic icon button action-button"
+        >
           <i className="icon circle pencil alternate" />
         </button>
       );
@@ -151,10 +155,20 @@ class Employee extends Component {
 }
 
 Employee.propTypes = {
-  employee: PropTypes.object.isRequired,
+  employee: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    name: PropTypes.string.isRequired,
+    active: PropTypes.bool.isRequired,
+    departmentID: PropTypes.number.isRequired,
+  }).isRequired,
   onSave: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
-  departments: PropTypes.array.isRequired,
+  departments: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      name: PropTypes.string.isRequired,
+    }),
+  ).isRequired,
 };
 
 export default Employee;

@@ -82,8 +82,8 @@ class EmployeePanel extends Component {
   };
 
   searchEmployees = query => {
-    const { currentPage, limit } = this.state.pagination;
-    Axios.get(`/employees/?s=${query}&page=${currentPage}&limit=${limit}`).then(response => {
+    const { limit } = this.state.pagination;
+    Axios.get(`/employees/?s=${query}&page=1&limit=${limit}`).then(response => {
       this.setState({
         employees: response.data.employee,
         pagination: response.data.pagination,
@@ -109,7 +109,7 @@ class EmployeePanel extends Component {
         <div className="row section-header">Employees</div>
         <div className="row section-body employee-panel">
           <div className="employee-panel__top-control">
-            <Search searchEmployees={this.searchEmployees} />
+            <Search query={query} searchEmployees={this.searchEmployees} />
             <button onClick={this.addEmptyEmployee} className="ui green circular icon button">
               <i className="icon plus circle" />
             </button>
@@ -135,11 +135,13 @@ class EmployeePanel extends Component {
               ))}
             </tbody>
           </table>
-          <Pagination
-            query={query}
-            getEmployeesPage={this.getEmployeesPage}
-            pagination={pagination}
-          />
+          {pagination.totalPages && (
+            <Pagination
+              query={query}
+              getEmployeesPage={this.getEmployeesPage}
+              pagination={pagination}
+            />
+          )}
         </div>
       </div>
     );
