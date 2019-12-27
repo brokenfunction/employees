@@ -39,9 +39,9 @@ module.exports = {
             } else if (!await user.validPassword(req.body.password)) {
                 res.status(401).json({ msg: 'Password is incorrect' });
             } else {
-                let payload = { id: user.id };
-                let token = jwt.sign(payload, jwtOptions.secretOrKey);
-                res.json({ msg: 'ok', token: token });
+                let payload = user.getJWT();
+                //let token = jwt.sign(payload, jwtOptions.secretOrKey);
+                res.status(200).send(payload)
             }
         });
     }
