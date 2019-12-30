@@ -1,9 +1,13 @@
 const express = require('express');
+<<<<<<< HEAD
 const jwt = require('jsonwebtoken');
+=======
+>>>>>>> 8bada95a6d49d9c69dae1dc899c1bcf630e85185
 const passport = require('passport');
 
 const router = express.Router();
 const userController = require('../controllers').user;
+require('../middleware/passport')(passport);
 
 //router.get('/:id', userController.selectByID);
 router.post('/', userController.register);
