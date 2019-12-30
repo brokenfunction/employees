@@ -1,4 +1,7 @@
 const Sequelize = require('sequelize');
+const jwt = require('jsonwebtoken');
+const passport = require('passport');
+const jwtSecret = require('../middleware/jwtConfig');
 const { User } = require('../models');
 
 module.exports = {
@@ -14,7 +17,7 @@ module.exports = {
             })
             .catch(error => {
                 if(error instanceof Sequelize.UniqueConstraintError ) {
-                    res.status(400).send(error.errors.message);
+                    res.status(400).send(error.errors);
                 } else {
                     res.status(500).send(error);
                 }
@@ -39,9 +42,16 @@ module.exports = {
             } else if (!await user.validPassword(req.body.password)) {
                 res.status(401).json({ msg: 'Password is incorrect' });
             } else {
-                let payload = { id: user.id };
-                let token = jwt.sign(payload, jwtOptions.secretOrKey);
-                res.json({ msg: 'ok', token: token });
+                /*let payload = { id: user.id };
+                let token = jwt.sign(payload, jwtOptions.secretOrKey);*/
+                const token = jwt.sign({ id: user.id }, jwtSecret.secret, {
+                    expiresIn: 60 * 60,
+                });
+                res.status(200).send({
+                    auth: true,
+                    token,
+                    message: 'user found & logged in',
+                });
             }
         });
     }
